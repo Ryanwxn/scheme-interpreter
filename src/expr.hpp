@@ -194,6 +194,11 @@ struct IsProcedure : Unary {
     virtual Value evalRator(const Value &) override;
 };
 
+struct IsSymbol : Unary {
+    IsSymbol(const Expr &);
+    virtual Value evalRator(const Value &) override;
+};
+
 struct Not : Unary {
     Not(const Expr &);
     virtual Value evalRator(const Value &) override;

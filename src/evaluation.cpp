@@ -18,27 +18,59 @@ Value Apply::eval(Assoc &e) {}
 
 Value Letrec::eval(Assoc &env) {}
 
-Value Var::eval(Assoc &e) {}
+Value Var::eval(Assoc &e) {
+    return find(this -> x, e);
+}
 
-Value Fixnum::eval(Assoc &e) {}
+Value Fixnum::eval(Assoc &e) {
+    return IntegerV(this -> n);
+}
 
-Value If::eval(Assoc &e) {}
+Value If::eval(Assoc &e) {
+    Value cond = this -> cond -> eval(e);
+    if(cond -> v_type == V_BOOL) {
+        Boolean *condBool = dynamic_cast<Boolean*>(cond.get());
+        if(condBool -> b) return this -> conseq -> eval(e);
+        else return this -> alter -> eval(e);
+    }
+    else return this -> conseq -> eval(e);
+}
 
-Value True::eval(Assoc &e) {}
+Value True::eval(Assoc &e) {
+    return BooleanV(true);
+}
 
-Value False::eval(Assoc &e) {}
+Value False::eval(Assoc &e) {
+    return BooleanV(false);
+}
 
-Value Begin::eval(Assoc &e) {}
+Value Begin::eval(Assoc &e) {
+    int exprNum = this -> es.size();
+    Value tmp = NullV();
+    for(int i = 0; i < exprNum; ++i)
+        tmp = this -> es[i] -> eval(e);
+    return tmp;
+}
 
 Value syntaxToValue(const Syntax &syntax) {}
 
-Value Quote::eval(Assoc &e) {}
+Value Quote::eval(Assoc &e) {
+    return syntaxToValue(this -> s);
+}
 
-Value MakeVoid::eval(Assoc &e) {}
+Value MakeVoid::eval(Assoc &e) {
+    return VoidV();
+}
 
-Value Exit::eval(Assoc &e) {}
+Value Exit::eval(Assoc &e) {
+    return TerminateV();
+}
 
-Value Binary::eval(Assoc &e) {}
+Value Binary::eval(Assoc &e) {
+    Value rand1V = this -> rand1 -> eval(e);
+    Value rand2V = this -> rand2 -> eval(e); 
+    return this -> evalRator(rand1V, rand2V);
+}
 
 Value Unary::eval(Assoc &e) {}
 
@@ -71,6 +103,8 @@ Value IsNull::evalRator(const Value &rand) {}
 Value IsPair::evalRator(const Value &rand) {}
 
 Value IsProcedure::evalRator(const Value &rand) {}
+
+Value IsSymbol::evalRator(const Value &rand) {}
 
 Value Not::evalRator(const Value &rand) {}
 
