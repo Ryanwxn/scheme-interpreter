@@ -180,7 +180,7 @@ Expr List :: parse(Assoc &env) {
             }
         }
     } else {
-        if(lead -> eval(env) -> v_type == E_PROCQ) {
+        if(lead -> e_type == E_PROCQ) {
             std::vector<Expr> paras;
             for(int i = 1; i < arguNum; ++i)
                 paras.push_back(this -> stxs[i] -> parse(env));
