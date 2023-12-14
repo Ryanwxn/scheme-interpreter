@@ -15,6 +15,11 @@ struct Value;
 struct AssocList;
 struct Assoc;
 
+enum SyntaxType
+{
+    S_NUM, S_TRUE, S_FALSE, S_IDEN, S_LIST
+};
+
 enum ExprType
 {
     E_LET, E_LAMBDA, E_APPLY, E_LETREC, E_VAR, E_FIXNUM, 

@@ -34,6 +34,25 @@ Value find(const std::string &x, Assoc &l) {
   return Value(nullptr);
 }
 
+Value Number::eval() {
+  return IntegerV(this -> n);
+}
+Value TrueSyntax::eval() {
+  return BooleanV(true);
+}
+Value FalseSyntax::eval() {
+  return BooleanV(false);
+}
+Value Identifier::eval() {
+  return SymbolV(this -> s);
+}
+Value List::eval() {
+  Value result = NullV();
+  for(auto &syn : this -> stxs)
+    result = PairV(syn -> eval(), result);
+  return result;
+}
+
 std::ostream &operator<<(std::ostream &os, Value &v) {
   v -> show(os);
   return os;

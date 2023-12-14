@@ -1,31 +1,35 @@
 #include "syntax.hpp"
+#include "RE.hpp"
 #include <cstring>
 #include <vector>
 
 Syntax :: Syntax(SyntaxBase *stx) : ptr(stx) {}
+SyntaxBase :: SyntaxBase(SyntaxType st) : s_type(st) {}
 SyntaxBase* Syntax :: operator -> () const { return ptr.get(); }
 SyntaxBase& Syntax :: operator * () { return *ptr; }
 SyntaxBase* Syntax :: get() const { return ptr.get(); }
 
-Number :: Number(int n) : n(n) {}
+Number :: Number(int n) : SyntaxBase(S_NUM), n(n) {}
 void Number::show(std::ostream &os) {
   os << "the-number-" << n;
 }
 
+TrueSyntax :: TrueSyntax() : SyntaxBase(S_TRUE) {}
 void TrueSyntax::show(std::ostream &os) {
   os << "#t";
 }
 
+FalseSyntax :: FalseSyntax() : SyntaxBase(S_FALSE) {}
 void FalseSyntax::show(std::ostream &os) {
   os << "#f";
 }
 
-Identifier :: Identifier(const std :: string &s1) : s(s1) {}
+Identifier :: Identifier(const std :: string &s1) : SyntaxBase(S_IDEN), s(s1) {}
 void Identifier::show(std::ostream &os) {
   os << s;
 }
 
-List :: List() {}
+List :: List() : SyntaxBase(S_LIST) {}
 void List::show(std::ostream &os) {
   os << '(';
   for (auto stx : stxs) {
