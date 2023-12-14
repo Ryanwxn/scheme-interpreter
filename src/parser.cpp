@@ -121,6 +121,8 @@ Expr List :: parse(Assoc &env) {
                         if(argu.size() != 2 || argu[0] -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In let.");
                         std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;
+                        if(primitives.find(var) != primitives.end())
+                            throw RuntimeError("<Parser> In let.");
                         Expr expr = argu[1] -> parse(env);
                         bodyEnv = extend(var, expr -> eval(env), bodyEnv);
                         arguList.emplace_back(var, expr);
@@ -138,7 +140,9 @@ Expr List :: parse(Assoc &env) {
                         std::vector<Syntax> argu = dynamic_cast<List*>(syn.get()) -> stxs;
                         if(argu.size() != 2 || argu[0] -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In letrec.");
-                        std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;
+                        std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;                            
+                        if(primitives.find(var) != primitives.end())
+                            throw RuntimeError("<Parser> In letrec.");
                         virtualEnv = extend(var, Value(nullptr), virtualEnv);
                     }
                     Assoc bodyEnv = env;
@@ -157,7 +161,10 @@ Expr List :: parse(Assoc &env) {
                     for(auto &syn : dynamic_cast<List*>(this -> stxs[1].get()) -> stxs) {
                         if(syn -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In Lambda.");
-                        paras.push_back(dynamic_cast<Identifier*>(syn.get()) -> s);
+                        std::string para = dynamic_cast<Identifier*>(syn.get()) -> s;
+                        if(primitives.find(para) != primitives.end())
+                            throw RuntimeError("<Parser> In Lambda.");
+                        paras.push_back(para);
                     }
                     return Expr(new Lambda(paras, this -> stxs[2] -> parse(env)));
                 }

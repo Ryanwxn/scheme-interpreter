@@ -14,6 +14,7 @@ Value Let::eval(Assoc &env) {
     Assoc bodyEnv = env;
     for(auto &[argName, argValue] : this -> bind)
         bodyEnv = extend(argName, argValue -> eval(env), bodyEnv);
+    std::cout << "Let" << std::endl;
     return this -> body -> eval(bodyEnv);
 }
 
@@ -21,6 +22,7 @@ Value Lambda::eval(Assoc &env) {
     std::vector<std::string> paras;
     for(auto &para : this -> x)
         paras.push_back(para);
+    std::cout << "Lambda" << std::endl;
     return ClosureV(paras, this -> e, env);
 }
 
@@ -35,21 +37,28 @@ Value Apply::eval(Assoc &e) {
     int paraNum = this -> rand.size();
     for(int i = 0; i < paraNum; ++i)
         bodyEnv = extend(clos -> parameters[i], this -> rand[i] -> eval(e), bodyEnv);
+    std::cout << "Apply" << std::endl;
     return clos -> e -> eval(bodyEnv);
 }
 
 Value Letrec::eval(Assoc &env) {
     Assoc virtualEnv = env;
+    std::cout << "Letrec0" << std::endl;
     for(auto &[argName, argValue] : this -> bind)
         virtualEnv = extend(argName, Value(nullptr), virtualEnv);
     Assoc bodyEnv = env;
+    std::cout << "Letrec1" << std::endl;
     for(auto &[argName, argValue] : this -> bind)
         bodyEnv = extend(argName, argValue -> eval(virtualEnv), bodyEnv);
+    std::cout << "Letrec" << std::endl;
     return this -> body -> eval(bodyEnv);
 }
 
 Value Var::eval(Assoc &e) {
-    return find(this -> x, e);
+    Value result = find(this -> x, e);
+    if(result.get() == nullptr)
+        throw RuntimeError("<Evaluation> Undefined variable.");
+    return result;
 }
 
 Value Fixnum::eval(Assoc &e) {

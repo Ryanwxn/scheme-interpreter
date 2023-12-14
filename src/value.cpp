@@ -148,11 +148,15 @@ Value TerminateV() {
 
 Pair::Pair(const Value &car, const Value &cdr) : ValueBase(V_PAIR), car(car), cdr(cdr) {}
 Value PairV(const Value &car, const Value &cdr) {
+  car -> show(std::cout); std::cout << std::endl;
+  cdr -> show(std::cout); std::cout << std::endl;
   return Value(new Pair(car, cdr));
 }
 
 Closure::Closure(const std::vector<std::string> &xs, const Expr &e, const Assoc &env)
   : ValueBase(V_PROC), parameters(xs), e(e), env(env) {}
 Value ClosureV(const std::vector<std::string> &xs, const Expr &e, const Assoc &env) {
+  for(auto &str : xs)
+    std::cout << str << std::endl;
   return Value(new Closure(xs, e, env));
 }
