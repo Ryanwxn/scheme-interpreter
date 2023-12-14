@@ -131,7 +131,7 @@ Value Less::evalRator(const Value &rand1, const Value &rand2) {
         throw RuntimeError("<Evaluation> In Less.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
-    return IntegerV(rand1V < rand2V);
+    return BooleanV(rand1V < rand2V);
 }
 
 Value LessEq::evalRator(const Value &rand1, const Value &rand2) {
@@ -139,7 +139,7 @@ Value LessEq::evalRator(const Value &rand1, const Value &rand2) {
         throw RuntimeError("<Evaluation> In LessEq.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
-    return IntegerV(rand1V <= rand2V);
+    return BooleanV(rand1V <= rand2V);
 }
 
 Value Equal::evalRator(const Value &rand1, const Value &rand2) {
@@ -147,7 +147,7 @@ Value Equal::evalRator(const Value &rand1, const Value &rand2) {
         throw RuntimeError("<Evaluation> In Equal.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
-    return IntegerV(rand1V == rand2V);
+    return BooleanV(rand1V == rand2V);
 }
 
 Value GreaterEq::evalRator(const Value &rand1, const Value &rand2) {
@@ -155,7 +155,7 @@ Value GreaterEq::evalRator(const Value &rand1, const Value &rand2) {
         throw RuntimeError("<Evaluation> In GreaterEq.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
-    return IntegerV(rand1V >= rand2V);
+    return BooleanV(rand1V >= rand2V);
 }
 
 Value Greater::evalRator(const Value &rand1, const Value &rand2) {
@@ -163,7 +163,7 @@ Value Greater::evalRator(const Value &rand1, const Value &rand2) {
         throw RuntimeError("<Evaluation> In Greater.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
-    return IntegerV(rand1V > rand2V);
+    return BooleanV(rand1V > rand2V);
 }
 
 Value IsEq::evalRator(const Value &rand1, const Value &rand2) {

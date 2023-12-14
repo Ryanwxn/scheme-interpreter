@@ -3,8 +3,8 @@
 echo "This is a simple score shell script for you to find out problems in your program"
 echo "--------------------------------------------------------------------------------"
 
-L=4
-R=4
+L=21
+R=30
 for ((i = $L; i <= $R; i = i + 1))
 do
     echo ""
