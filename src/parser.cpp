@@ -187,6 +187,8 @@ Expr List :: parse(Assoc &env) {
             return Expr(new Apply(lead, paras));
         } else throw new RuntimeError("<Parser> The first token is illegel.");
     }
+    throw new RuntimeError("<Parser> Can't match any condition.");
+    return Expr(nullptr);
 }
 
 #endif
