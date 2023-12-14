@@ -52,7 +52,7 @@ Expr List :: parse(Assoc &env) {
             int funcType = primitives[funcName];
             if((funcType >= E_MUL && funcType <= E_GT ) || funcType == E_CONS || funcType == E_EQQ) {
                 if(arguNum != 3)
-                    throw new RuntimeError("<Parser> A function with two parameters gets wrong number of parameters.");
+                    throw RuntimeError("<Parser> A function with two parameters gets wrong number of parameters.");
                 Expr lhs = this -> stxs[1].parse(env);
                 Expr rhs = this -> stxs[2].parse(env);
                 switch(funcType) {
@@ -70,7 +70,7 @@ Expr List :: parse(Assoc &env) {
             }
             if((funcType >= E_BOOLQ && funcType <= E_PROCQ) || (funcType >= E_NOT && funcType <= E_CDR)) {
                 if(arguNum != 2)
-                    throw new RuntimeError("<Parser> A function with one parameter gets wrong number of parameteres.");
+                    throw RuntimeError("<Parser> A function with one parameter gets wrong number of parameteres.");
                 Expr expr = this -> stxs[1].parse(env);
                 switch(funcType) {
                     case E_NOT : return Expr(new Not(expr));
@@ -86,12 +86,12 @@ Expr List :: parse(Assoc &env) {
             }
             if(funcType == E_VOID) {
                 if(arguNum != 1)
-                    throw new RuntimeError("<Parser> A function with no parameter gets parameters.");
+                    throw RuntimeError("<Parser> A function with no parameter gets parameters.");
                 return Expr(new MakeVoid());
             }
             if(funcType == E_EXIT) {
                 if(arguNum != 1)
-                    throw new RuntimeError("<Parser> A function with no parameter gets parameters.");
+                    throw RuntimeError("<Parser> A function with no parameter gets parameters.");
                 return Expr(new Exit());
             }
         }
@@ -103,7 +103,7 @@ Expr List :: parse(Assoc &env) {
                 for(int i = 1; i < arguNum; ++i)
                     rand.push_back(this -> stxs[i] -> parse(env));
                 return Expr(new Apply(lead, rand));
-            } else throw new RuntimeError("<Parser> The first token is illegel.");
+            } else throw RuntimeError("<Parser> The first token is illegel.");
         }
         // the first token is a reserved word
         if(reserved_words.find(funcName) != reserved_words.end()) {
@@ -111,15 +111,15 @@ Expr List :: parse(Assoc &env) {
             switch(funcType) {
                 case E_LET : {
                     if(arguNum != 3 || this -> stxs[1] -> s_type != S_LIST)
-                        throw new RuntimeError("<Parser> In let.");
+                        throw RuntimeError("<Parser> In let.");
                     std::vector<std::pair<std::string, Expr>> arguList;
                     Assoc bodyEnv = env;
                     for(auto &syn : dynamic_cast<List*>(this -> stxs[1].get()) -> stxs) {
                         if(syn -> s_type != S_LIST)
-                            throw new RuntimeError("<Parser> In let.");
+                            throw RuntimeError("<Parser> In let.");
                         std::vector<Syntax> argu = dynamic_cast<List*>(syn.get()) -> stxs;
                         if(argu.size() != 2 || argu[0] -> s_type != S_IDEN)
-                            throw new RuntimeError("<Parser> In let.");
+                            throw RuntimeError("<Parser> In let.");
                         std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;
                         Expr expr = argu[1] -> parse(env);
                         bodyEnv = extend(var, expr -> eval(env), bodyEnv);
@@ -129,15 +129,15 @@ Expr List :: parse(Assoc &env) {
                 }
                 case E_LETREC : {
                     if(arguNum != 3 || this -> stxs[1] -> s_type != S_LIST)
-                        throw new RuntimeError("<Parser> In letrec.");
+                        throw RuntimeError("<Parser> In letrec.");
                     std::vector<std::pair<std::string, Expr>> arguList;
                     Assoc virtualEnv = env;
                     for(auto &syn : dynamic_cast<List*>(this -> stxs[1].get()) -> stxs) {
                         if(syn -> s_type != S_LIST)
-                            throw new RuntimeError("<Parser> In letrec.");
+                            throw RuntimeError("<Parser> In letrec.");
                         std::vector<Syntax> argu = dynamic_cast<List*>(syn.get()) -> stxs;
                         if(argu.size() != 2 || argu[0] -> s_type != S_IDEN)
-                            throw new RuntimeError("<Parser> In letrec.");
+                            throw RuntimeError("<Parser> In letrec.");
                         std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;
                         virtualEnv = extend(var, Value(nullptr), virtualEnv);
                     }
@@ -152,18 +152,18 @@ Expr List :: parse(Assoc &env) {
                 }
                 case E_LAMBDA : {
                     if(arguNum != 3 || this -> stxs[1] -> s_type != S_LIST)
-                        throw new RuntimeError("<Parser> In Lambda.");
+                        throw RuntimeError("<Parser> In Lambda.");
                     std::vector<std::string> paras;
                     for(auto &syn : dynamic_cast<List*>(this -> stxs[1].get()) -> stxs) {
                         if(syn -> s_type != S_IDEN)
-                            throw new RuntimeError("<Parser> In Lambda.");
+                            throw RuntimeError("<Parser> In Lambda.");
                         paras.push_back(dynamic_cast<Identifier*>(syn.get()) -> s);
                     }
                     return Expr(new Lambda(paras, this -> stxs[2] -> parse(env)));
                 }
                 case E_IF : {
                     if(arguNum != 4)
-                        throw new RuntimeError("<Parser> In If.");
+                        throw RuntimeError("<Parser> In If.");
                     return Expr(new If(this -> stxs[1] -> parse(env), this -> stxs[2] -> parse(env), this -> stxs[3] -> parse(env)));
                 }
                 case E_BEGIN : {
@@ -174,7 +174,7 @@ Expr List :: parse(Assoc &env) {
                 }
                 case E_QUOTE : {
                     if(arguNum != 2)
-                        throw new RuntimeError("<Parser> In Quote.");
+                        throw RuntimeError("<Parser> In Quote.");
                     return Expr(new Quote(this -> stxs[1]));
                 }
             }
@@ -185,9 +185,9 @@ Expr List :: parse(Assoc &env) {
             for(int i = 1; i < arguNum; ++i)
                 paras.push_back(this -> stxs[i] -> parse(env));
             return Expr(new Apply(lead, paras));
-        } else throw new RuntimeError("<Parser> The first token is illegel.");
+        } else throw RuntimeError("<Parser> The first token is illegel.");
     }
-    throw new RuntimeError("<Parser> Can't match any condition.");
+    throw RuntimeError("<Parser> Can't match any condition.");
     return Expr(nullptr);
 }
 

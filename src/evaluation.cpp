@@ -27,11 +27,11 @@ Value Lambda::eval(Assoc &env) {
 Value Apply::eval(Assoc &e) {
     Value func = this -> rator -> eval(e);
     if(func -> v_type != V_PROC)
-        throw new RuntimeError("<Evaluation> In apply : the first value is not a closure.");
+        throw RuntimeError("<Evaluation> In apply : the first value is not a closure.");
     Closure* clos = dynamic_cast<Closure*>(func.get());
     Assoc bodyEnv = clos -> env;
     if(this -> rand.size() != clos -> parameters.size())
-        throw new RuntimeError("<Evaluation> In apply : the number of parameters doesn't match.");
+        throw RuntimeError("<Evaluation> In apply : the number of parameters doesn't match.");
     int paraNum = this -> rand.size();
     for(int i = 0; i < paraNum; ++i)
         bodyEnv = extend(clos -> parameters[i], this -> rand[i] -> eval(e), bodyEnv);
@@ -104,7 +104,7 @@ Value Unary::eval(Assoc &e) {
 
 Value Mult::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In Mult.");
+        throw RuntimeError("<Evaluation> In Mult.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V * rand2V);
@@ -112,7 +112,7 @@ Value Mult::evalRator(const Value &rand1, const Value &rand2) {
 
 Value Plus::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In Plus.");
+        throw RuntimeError("<Evaluation> In Plus.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V + rand2V);  
@@ -120,7 +120,7 @@ Value Plus::evalRator(const Value &rand1, const Value &rand2) {
 
 Value Minus::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In Minus.");
+        throw RuntimeError("<Evaluation> In Minus.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V - rand2V);
@@ -128,7 +128,7 @@ Value Minus::evalRator(const Value &rand1, const Value &rand2) {
 
 Value Less::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In Less.");
+        throw RuntimeError("<Evaluation> In Less.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V < rand2V);
@@ -136,7 +136,7 @@ Value Less::evalRator(const Value &rand1, const Value &rand2) {
 
 Value LessEq::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In LessEq.");
+        throw RuntimeError("<Evaluation> In LessEq.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V <= rand2V);
@@ -144,7 +144,7 @@ Value LessEq::evalRator(const Value &rand1, const Value &rand2) {
 
 Value Equal::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In Equal.");
+        throw RuntimeError("<Evaluation> In Equal.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V == rand2V);
@@ -152,7 +152,7 @@ Value Equal::evalRator(const Value &rand1, const Value &rand2) {
 
 Value GreaterEq::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In GreaterEq.");
+        throw RuntimeError("<Evaluation> In GreaterEq.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V >= rand2V);
@@ -160,7 +160,7 @@ Value GreaterEq::evalRator(const Value &rand1, const Value &rand2) {
 
 Value Greater::evalRator(const Value &rand1, const Value &rand2) {
     if(rand1 -> v_type != V_INT || rand2 -> v_type != V_INT)
-        throw new RuntimeError("<Evaluation> In Greater.");
+        throw RuntimeError("<Evaluation> In Greater.");
     int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
     int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
     return IntegerV(rand1V > rand2V);
@@ -224,14 +224,14 @@ Value Not::evalRator(const Value &rand) {
 
 Value Car::evalRator(const Value &rand) {
     if(rand -> v_type != V_PAIR)
-        throw new RuntimeError("<Evaluation> In Car.");
+        throw RuntimeError("<Evaluation> In Car.");
     Pair *randV = dynamic_cast<Pair*>(rand.get());
     return randV -> car;
 }
 
 Value Cdr::evalRator(const Value &rand) {
     if(rand -> v_type != V_PAIR)
-        throw new RuntimeError("<Evaluation> In Cdr.");
+        throw RuntimeError("<Evaluation> In Cdr.");
     Pair *randV = dynamic_cast<Pair*>(rand.get());
     return randV -> cdr;
 }

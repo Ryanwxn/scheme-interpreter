@@ -48,8 +48,9 @@ Value Identifier::eval() {
 }
 Value List::eval() {
   Value result = NullV();
-  for(auto &syn : this -> stxs)
-    result = PairV(syn -> eval(), result);
+  int synNum = this -> stxs.size();
+  for(int i = synNum - 1; ~i; --i)
+    result = PairV(this -> stxs[i] -> eval(), result);
   return result;
 }
 
