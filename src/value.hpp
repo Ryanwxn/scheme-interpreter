@@ -40,6 +40,8 @@ struct AssocList {
   AssocList(const std::string &, const Value &, Assoc &);
 };
 
+void show(std::ostream&, Assoc&);
+
 struct Void : ValueBase {
   Void();
   virtual void show(std::ostream &) override;

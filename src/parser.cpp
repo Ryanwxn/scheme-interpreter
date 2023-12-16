@@ -68,7 +68,7 @@ Expr List :: parse(Assoc &env) {
                     case E_EQQ : return Expr(new IsEq(lhs, rhs));
                 }
             }
-            if((funcType >= E_BOOLQ && funcType <= E_PROCQ) || (funcType >= E_NOT && funcType <= E_CDR)) {
+            if((funcType >= E_BOOLQ && funcType <= E_SYMBOLQ) || (funcType >= E_NOT && funcType <= E_CDR)) {
                 if(arguNum != 2)
                     throw RuntimeError("<Parser> A function with one parameter gets wrong number of parameteres.");
                 Expr expr = this -> stxs[1].parse(env);
@@ -98,12 +98,10 @@ Expr List :: parse(Assoc &env) {
         Value func = find(funcName, env);
         // the first token is a variable
         if(func.get() != nullptr) {
-            if(func -> v_type == V_PROC) {
-                std::vector<Expr> rand;
-                for(int i = 1; i < arguNum; ++i)
-                    rand.push_back(this -> stxs[i] -> parse(env));
-                return Expr(new Apply(lead, rand));
-            } else throw RuntimeError("<Parser> The first token is illegel.");
+            std::vector<Expr> rand;
+            for(int i = 1; i < arguNum; ++i)
+                rand.push_back(this -> stxs[i] -> parse(env));
+            return Expr(new Apply(lead, rand));
         }
         // the first token is a reserved word
         if(reserved_words.find(funcName) != reserved_words.end()) {
@@ -124,7 +122,7 @@ Expr List :: parse(Assoc &env) {
                         if(primitives.find(var) != primitives.end())
                             throw RuntimeError("<Parser> In let.");
                         Expr expr = argu[1] -> parse(env);
-                        bodyEnv = extend(var, expr -> eval(env), bodyEnv);
+                        bodyEnv = extend(var, VoidV(), bodyEnv);
                         arguList.emplace_back(var, expr);
                     }
                     return Expr(new Let(arguList, this -> stxs[2] -> parse(bodyEnv)));
@@ -150,23 +148,26 @@ Expr List :: parse(Assoc &env) {
                         std::vector<Syntax> argu = dynamic_cast<List*>(syn.get()) -> stxs;
                         std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;
                         Expr expr = argu[1] -> parse(virtualEnv);
-                        bodyEnv = extend(var, expr -> eval(virtualEnv), bodyEnv);
+                        arguList.emplace_back(var, expr);
+                        bodyEnv = extend(var, VoidV(), bodyEnv);
                     }                    
-                    return Expr(new Let(arguList, this -> stxs[2] -> parse(bodyEnv)));                    
+                    return Expr(new Letrec(arguList, this -> stxs[2] -> parse(bodyEnv)));                    
                 }
                 case E_LAMBDA : {
                     if(arguNum != 3 || this -> stxs[1] -> s_type != S_LIST)
                         throw RuntimeError("<Parser> In Lambda.");
                     std::vector<std::string> paras;
+                    Assoc bodyEnv = env;
                     for(auto &syn : dynamic_cast<List*>(this -> stxs[1].get()) -> stxs) {
                         if(syn -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In Lambda.");
                         std::string para = dynamic_cast<Identifier*>(syn.get()) -> s;
                         if(primitives.find(para) != primitives.end())
                             throw RuntimeError("<Parser> In Lambda.");
+                        bodyEnv = extend(para, VoidV(), bodyEnv);
                         paras.push_back(para);
                     }
-                    return Expr(new Lambda(paras, this -> stxs[2] -> parse(env)));
+                    return Expr(new Lambda(paras, this -> stxs[2] -> parse(bodyEnv)));
                 }
                 case E_IF : {
                     if(arguNum != 4)
@@ -186,16 +187,11 @@ Expr List :: parse(Assoc &env) {
                 }
             }
         }
-    } else {
-        if(lead -> e_type == E_PROCQ) {
-            std::vector<Expr> paras;
-            for(int i = 1; i < arguNum; ++i)
-                paras.push_back(this -> stxs[i] -> parse(env));
-            return Expr(new Apply(lead, paras));
-        } else throw RuntimeError("<Parser> The first token is illegel.");
     }
-    throw RuntimeError("<Parser> Can't match any condition.");
-    return Expr(nullptr);
+    std::vector<Expr> paras;
+    for(int i = 1; i < arguNum; ++i)
+        paras.push_back(this -> stxs[i] -> parse(env));
+    return Expr(new Apply(lead, paras));
 }
 
 #endif

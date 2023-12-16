@@ -34,6 +34,14 @@ Value find(const std::string &x, Assoc &l) {
   return Value(nullptr);
 }
 
+void show(std::ostream &os, Assoc &e) {
+  for(auto i = e; i.get() != nullptr; i = i -> next) {
+    os << " para_name : " << i -> x;
+    if(i -> v.get() != nullptr) os << " para_value : " << i -> v;
+    os << std::endl;
+  }
+}
+
 Value Number::eval() {
   return IntegerV(this -> n);
 }
@@ -49,6 +57,17 @@ Value Identifier::eval() {
 Value List::eval() {
   Value result = NullV();
   int synNum = this -> stxs.size();
+  // if(synNum == 2 && this -> stxs[0] -> s_type == S_IDEN)
+    // if(dynamic_cast<Identifier*>(this -> stxs[0].get()) -> s == "quote")
+      // return this -> stxs[1] -> eval();
+  if(synNum >= 3 && this -> stxs[synNum - 2] -> s_type == S_IDEN) {
+    if(dynamic_cast<Identifier*>(this -> stxs[synNum - 2].get()) -> s == ".") {
+      Value result = this -> stxs[synNum - 1] -> eval();
+      for(int i = synNum - 3; ~i; --i)
+        result = PairV(this -> stxs[i] -> eval(), result);
+      return result;
+    }
+  }
   for(int i = synNum - 1; ~i; --i)
     result = PairV(this -> stxs[i] -> eval(), result);
   return result;
@@ -148,15 +167,11 @@ Value TerminateV() {
 
 Pair::Pair(const Value &car, const Value &cdr) : ValueBase(V_PAIR), car(car), cdr(cdr) {}
 Value PairV(const Value &car, const Value &cdr) {
-  car -> show(std::cout); std::cout << std::endl;
-  cdr -> show(std::cout); std::cout << std::endl;
   return Value(new Pair(car, cdr));
 }
 
 Closure::Closure(const std::vector<std::string> &xs, const Expr &e, const Assoc &env)
   : ValueBase(V_PROC), parameters(xs), e(e), env(env) {}
 Value ClosureV(const std::vector<std::string> &xs, const Expr &e, const Assoc &env) {
-  for(auto &str : xs)
-    std::cout << str << std::endl;
   return Value(new Closure(xs, e, env));
 }

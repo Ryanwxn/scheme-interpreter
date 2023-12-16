@@ -14,15 +14,14 @@ Value Let::eval(Assoc &env) {
     Assoc bodyEnv = env;
     for(auto &[argName, argValue] : this -> bind)
         bodyEnv = extend(argName, argValue -> eval(env), bodyEnv);
-    std::cout << "Let" << std::endl;
     return this -> body -> eval(bodyEnv);
 }
 
 Value Lambda::eval(Assoc &env) {
     std::vector<std::string> paras;
+    Assoc bodyEnv = env;
     for(auto &para : this -> x)
         paras.push_back(para);
-    std::cout << "Lambda" << std::endl;
     return ClosureV(paras, this -> e, env);
 }
 
@@ -37,20 +36,22 @@ Value Apply::eval(Assoc &e) {
     int paraNum = this -> rand.size();
     for(int i = 0; i < paraNum; ++i)
         bodyEnv = extend(clos -> parameters[i], this -> rand[i] -> eval(e), bodyEnv);
-    std::cout << "Apply" << std::endl;
     return clos -> e -> eval(bodyEnv);
 }
 
 Value Letrec::eval(Assoc &env) {
     Assoc virtualEnv = env;
-    std::cout << "Letrec0" << std::endl;
     for(auto &[argName, argValue] : this -> bind)
         virtualEnv = extend(argName, Value(nullptr), virtualEnv);
-    Assoc bodyEnv = env;
-    std::cout << "Letrec1" << std::endl;
-    for(auto &[argName, argValue] : this -> bind)
-        bodyEnv = extend(argName, argValue -> eval(virtualEnv), bodyEnv);
-    std::cout << "Letrec" << std::endl;
+    Assoc bodyEnv = virtualEnv;
+    for(auto &[argName, argExpr] : this -> bind) {
+        Value argValue = argExpr -> eval(virtualEnv);
+        bodyEnv = extend(argName, argValue, bodyEnv);
+    }
+    for(auto &[argName, argExpr] : this -> bind) {
+        Value argValue = argExpr -> eval(bodyEnv);
+        modify(argName, argValue, bodyEnv);
+    }
     return this -> body -> eval(bodyEnv);
 }
 
@@ -176,12 +177,12 @@ Value Greater::evalRator(const Value &rand1, const Value &rand2) {
 }
 
 Value IsEq::evalRator(const Value &rand1, const Value &rand2) {
-    int rand1T = rand1 -> v_type;
-    int rand2T = rand2 -> v_type;
+    ValueType rand1T = rand1 -> v_type;
+    ValueType rand2T = rand2 -> v_type;
     if(rand1T == V_INT && rand1T == V_INT) {
         int rand1V = dynamic_cast<Integer*>(rand1.get()) -> n;
         int rand2V = dynamic_cast<Integer*>(rand2.get()) -> n;
-        return BooleanV(rand1V == rand1V);
+        return BooleanV(rand1V == rand2V);
     }
     if(rand1T == V_BOOL && rand2T == V_BOOL) {
         bool rand1V = dynamic_cast<Boolean*>(rand1.get()) -> b;
@@ -232,8 +233,12 @@ Value Not::evalRator(const Value &rand) {
 }
 
 Value Car::evalRator(const Value &rand) {
-    if(rand -> v_type != V_PAIR)
+    if(rand -> v_type != V_PAIR) {
+        std::cout << rand -> v_type << " ";
+        rand -> show(std::cout);
+        std::cout << std::endl;
         throw RuntimeError("<Evaluation> In Car.");
+    }
     Pair *randV = dynamic_cast<Pair*>(rand.get());
     return randV -> car;
 }
