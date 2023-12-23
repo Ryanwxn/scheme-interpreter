@@ -2,12 +2,20 @@
 #define SHARED_POINT
 
 #include <utility>
+#include <atomic>
+
+// #define PARALLEL_OPTIMIZE
+#ifndef PARALLEL_OPTIMIZE
+typedef int count_type;
+#else
+typedef std::atomic<int> count_type;
+#endif
 
 template <typename T>
 class SharedPtr {
 	private :
 		T* _ptr;
-		int* _cntPtr;
+		count_type* _cntPtr;
 		void erase() {
 			if(_ptr == nullptr || _cntPtr == nullptr) return;
 			--(*_cntPtr);
@@ -27,7 +35,7 @@ class SharedPtr {
 				return;
 			}
 			_ptr = ptr;
-			_cntPtr = new int(1);
+			_cntPtr = new count_type(1);
 		}
 		SharedPtr(const SharedPtr& ptr) {
 			if(ptr._ptr == nullptr) {
@@ -70,7 +78,7 @@ class SharedPtr {
 			_cntPtr = ptr._cntPtr;
 			if(_cntPtr != nullptr) ++(*_cntPtr);
 		}
-		int use_count() const {
+		count_type use_count() const {
 			if(_cntPtr == nullptr) return 0;
 			return *_cntPtr;
 		}
