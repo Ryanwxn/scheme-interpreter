@@ -35,6 +35,11 @@ void multiEval(std::vector<Expr>& exprs, std::vector<Value>& vals, Assoc& env) {
     for(int i = 0; i < num; ++i)
         thrs[i].join();
     if(flag) throw RuntimeError("RuntimeError");
+
+    /*
+    for(int i = 0; i < num; ++i)
+        vals[i] = exprs[i] -> eval(env);
+    */
 }
 
 Value Let::eval(Assoc &env) {
