@@ -14,11 +14,12 @@ extern std :: map<std :: string, ExprType> reserved_words;
 #include <atomic>
 #include <vector>
 
+// Multiple threads
+
 void _multiEval(Expr& expr, Value& val, Assoc& env, std::atomic_bool& flag) {
     try{
         val = expr -> eval(env);
     } catch (const RuntimeError& RE) {
-        std::cout << RE.message() << std::endl;
         flag = true;
     }
 }
