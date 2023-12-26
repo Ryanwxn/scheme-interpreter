@@ -4,7 +4,7 @@
 #include <utility>
 #include <atomic>
 
-// #define PARALLEL_OPTIMIZE
+#define PARALLEL_OPTIMIZE
 #ifndef PARALLEL_OPTIMIZE
 typedef int count_type;
 #else

@@ -10,10 +10,42 @@
 extern std :: map<std :: string, ExprType> primitives;
 extern std :: map<std :: string, ExprType> reserved_words;
 
+#include <thread>
+#include <atomic>
+#include <vector>
+
+void _multiEval(Expr& expr, Value& val, Assoc& env, std::atomic_bool& flag) {
+    try{
+        val = expr -> eval(env);
+    } catch (const RuntimeError& RE) {
+        std::cout << RE.message() << std::endl;
+        flag = true;
+    }
+}
+
+void multiEval(std::vector<Expr>& exprs, std::vector<Value>& vals, Assoc& env) {
+    std::atomic_bool flag = false;
+    int num = exprs.size();
+    vals.clear();
+    for(int i = 0; i < num; ++i) vals.push_back(Value(nullptr));
+    std::vector<std::thread> thrs(num);
+    for(int i = 0; i < num; ++i)
+        thrs[i] = std::thread(_multiEval, std::ref(exprs[i]), std::ref(vals[i]), std::ref(env), std::ref(flag));
+    for(int i = 0; i < num; ++i)
+        thrs[i].join();
+    if(flag) throw RuntimeError("RuntimeError");
+}
+
 Value Let::eval(Assoc &env) {
     Assoc bodyEnv = env;
-    for(auto &[argName, argValue] : this -> bind)
-        bodyEnv = extend(argName, argValue -> eval(env), bodyEnv);
+    std::vector<Expr> exprs;
+    std::vector<Value> vals;
+    int paraNum = this -> bind.size();
+    for(int i = 0; i < paraNum; ++i)
+        exprs.push_back(this -> bind[i].second);
+    multiEval(exprs, vals, env);
+    for(int i = 0; i < paraNum; ++i)
+        bodyEnv = extend(this -> bind[i].first, vals[i], bodyEnv);
     return this -> body -> eval(bodyEnv);
 }
 
@@ -34,8 +66,13 @@ Value Apply::eval(Assoc &e) {
     if(this -> rand.size() != clos -> parameters.size())
         throw RuntimeError("<Evaluation> In apply : the number of parameters doesn't match.");
     int paraNum = this -> rand.size();
+    std::vector<Expr> exprs;
+    std::vector<Value> vals;
     for(int i = 0; i < paraNum; ++i)
-        bodyEnv = extend(clos -> parameters[i], this -> rand[i] -> eval(e), bodyEnv);
+        exprs.push_back(this -> rand[i]);
+    multiEval(exprs, vals, e);
+    for(int i = 0; i < paraNum; ++i)
+        bodyEnv = extend(clos -> parameters[i], vals[i], bodyEnv);
     return clos -> e -> eval(bodyEnv);
 }
 
@@ -44,14 +81,20 @@ Value Letrec::eval(Assoc &env) {
     for(auto &[argName, argValue] : this -> bind)
         virtualEnv = extend(argName, Value(nullptr), virtualEnv);
     Assoc bodyEnv = virtualEnv;
-    for(auto &[argName, argExpr] : this -> bind) {
-        Value argValue = argExpr -> eval(virtualEnv);
-        bodyEnv = extend(argName, argValue, bodyEnv);
-    }
-    for(auto &[argName, argExpr] : this -> bind) {
-        Value argValue = argExpr -> eval(bodyEnv);
-        modify(argName, argValue, bodyEnv);
-    }
+    int paraNum = this -> bind.size();
+    std::vector<Expr> exprs;
+    std::vector<Value> vals;
+    for(int i = 0; i < paraNum; ++i)
+        exprs.push_back(this -> bind[i].second);
+    multiEval(exprs, vals, virtualEnv);
+    for(int i = 0; i < paraNum; ++i) 
+        bodyEnv = extend(this -> bind[i].first, vals[i], bodyEnv);
+    exprs.clear(), vals.clear();
+    for(int i = 0; i < paraNum; ++i)
+        exprs.push_back(this -> bind[i].second);
+    multiEval(exprs, vals, bodyEnv);
+    for(int i = 0; i < paraNum; ++i)
+        modify(this -> bind[i].first, vals[i], bodyEnv);
     return this -> body -> eval(bodyEnv);
 }
 
@@ -102,9 +145,12 @@ Value Exit::eval(Assoc &e) {
 }
 
 Value Binary::eval(Assoc &e) {
-    Value rand1V = this -> rand1 -> eval(e);
-    Value rand2V = this -> rand2 -> eval(e); 
-    return this -> evalRator(rand1V, rand2V);
+    std::vector<Expr> exprs;
+    std::vector<Value> vals;
+    exprs.push_back(this -> rand1);
+    exprs.push_back(this -> rand2);
+    multiEval(exprs, vals, e);
+    return this -> evalRator(vals[0], vals[1]);
 }
 
 Value Unary::eval(Assoc &e) {
