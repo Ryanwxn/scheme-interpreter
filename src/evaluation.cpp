@@ -15,15 +15,17 @@ extern std :: map<std :: string, ExprType> reserved_words;
 #include <vector>
 
 // Multiple threads
-
+// a function for multiple threads
 void _multiEval(Expr& expr, Value& val, Assoc& env, std::atomic_bool& flag) {
     try{
         val = expr -> eval(env);
     } catch (const RuntimeError& RE) {
+        // Throw error by setting the variable flag.
         flag = true;
     }
 }
 
+// Evaluate a bunch of expressions in multiple threads.
 void multiEval(std::vector<Expr>& exprs, std::vector<Value>& vals, Assoc& env) {
     std::atomic_bool flag = false;
     int num = exprs.size();
