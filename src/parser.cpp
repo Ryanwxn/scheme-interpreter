@@ -48,6 +48,14 @@ Expr List :: parse(Assoc &env) {
     if(leadType == E_VAR) {
         std::string funcName = dynamic_cast<Var*>(lead.get()) -> x;
         // the first token is a primitive
+        Value func = find(funcName, env);
+        // the first token is a variable
+        if(func.get() != nullptr) {
+            std::vector<Expr> rand;
+            for(int i = 1; i < arguNum; ++i)
+                rand.push_back(this -> stxs[i] -> parse(env));
+            return Expr(new Apply(lead, rand));
+        }
         if(primitives.find(funcName) != primitives.end()) {
             int funcType = primitives[funcName];
             if((funcType >= E_MUL && funcType <= E_GT ) || funcType == E_CONS || funcType == E_EQQ) {
@@ -95,14 +103,6 @@ Expr List :: parse(Assoc &env) {
                 return Expr(new Exit());
             }
         }
-        Value func = find(funcName, env);
-        // the first token is a variable
-        if(func.get() != nullptr) {
-            std::vector<Expr> rand;
-            for(int i = 1; i < arguNum; ++i)
-                rand.push_back(this -> stxs[i] -> parse(env));
-            return Expr(new Apply(lead, rand));
-        }
         // the first token is a reserved word
         if(reserved_words.find(funcName) != reserved_words.end()) {
             int funcType = reserved_words[funcName];
@@ -119,8 +119,8 @@ Expr List :: parse(Assoc &env) {
                         if(argu.size() != 2 || argu[0] -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In let.");
                         std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;
-                        if(primitives.find(var) != primitives.end())
-                            throw RuntimeError("<Parser> In let.");
+                        // if(primitives.find(var) != primitives.end())
+                        //     throw RuntimeError("<Parser> In let.");
                         Expr expr = argu[1] -> parse(env);
                         bodyEnv = extend(var, VoidV(), bodyEnv);
                         arguList.emplace_back(var, expr);
@@ -139,8 +139,8 @@ Expr List :: parse(Assoc &env) {
                         if(argu.size() != 2 || argu[0] -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In letrec.");
                         std::string var = dynamic_cast<Identifier*>(argu[0].get()) -> s;                            
-                        if(primitives.find(var) != primitives.end())
-                            throw RuntimeError("<Parser> In letrec.");
+                        // if(primitives.find(var) != primitives.end())
+                        //     throw RuntimeError("<Parser> In letrec.");
                         virtualEnv = extend(var, Value(nullptr), virtualEnv);
                     }
                     Assoc bodyEnv = env;
@@ -162,8 +162,6 @@ Expr List :: parse(Assoc &env) {
                         if(syn -> s_type != S_IDEN)
                             throw RuntimeError("<Parser> In Lambda.");
                         std::string para = dynamic_cast<Identifier*>(syn.get()) -> s;
-                        if(primitives.find(para) != primitives.end())
-                            throw RuntimeError("<Parser> In Lambda.");
                         bodyEnv = extend(para, VoidV(), bodyEnv);
                         paras.push_back(para);
                     }

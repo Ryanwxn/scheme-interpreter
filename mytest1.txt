@@ -1,0 +1,3 @@
+(letrec
+		   ([f (letrec ([g (lambda (x y) (+ x y))]) g)])
+		   		(let ([lhs (f 1 2)] [rhs (g 2 3)]) (f lhs rhs)))

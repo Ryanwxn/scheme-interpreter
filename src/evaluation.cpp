@@ -11,32 +11,27 @@ extern std :: map<std :: string, ExprType> primitives;
 extern std :: map<std :: string, ExprType> reserved_words;
 
 #include <thread>
-#include <atomic>
-#include <vector>
+// #include <atomic>
+// #include <vector>
 
 // Multiple threads
 // a function for multiple threads
-void _multiEval(Expr& expr, Value& val, Assoc& env, std::atomic_bool& flag) {
-    try{
-        val = expr -> eval(env);
-    } catch (const RuntimeError& RE) {
-        // Throw error by setting the variable flag.
-        flag = true;
-    }
-}
+// void _multiEval(Expr& expr, Value& val, Assoc& env, std::atomic_bool& flag) {
+//     try{
+//         val = expr -> eval(env);
+//     } catch (const RuntimeError& RE) {
+//         // Throw error by setting the variable flag.
+//         flag = true;
+//     }
+// }
 
 // Evaluate a bunch of expressions in multiple threads.
 void multiEval(std::vector<Expr>& exprs, std::vector<Value>& vals, Assoc& env) {
     std::atomic_bool flag = false;
     int num = exprs.size();
     vals.clear();
-    for(int i = 0; i < num; ++i) vals.push_back(Value(nullptr));
-    std::vector<std::thread> thrs(num);
-    for(int i = 0; i < num; ++i)
-        thrs[i] = std::thread(_multiEval, std::ref(exprs[i]), std::ref(vals[i]), std::ref(env), std::ref(flag));
-    for(int i = 0; i < num; ++i)
-        thrs[i].join();
-    if(flag) throw RuntimeError("RuntimeError");
+    for(int i = 0; i < num; ++i) vals.push_back(exprs[i] -> eval(env));
+    
 
     /*
     for(int i = 0; i < num; ++i)
@@ -302,4 +297,172 @@ Value Cdr::evalRator(const Value &rand) {
         throw RuntimeError("<Evaluation> In Cdr.");
     Pair *randV = dynamic_cast<Pair*>(rand.get());
     return randV -> cdr;
+}
+
+Value primitivePlus() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Plus(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveMinus() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Minus(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveMult() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Mult(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveLess() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Less(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveLessEq() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new LessEq(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveEqual() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Equal(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveGreaterEq() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new GreaterEq(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveGreater() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Greater(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveCons() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new Cons(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveIsEq() {
+  return ClosureV(
+    std::vector<std::string> {"operand1", "operand2"},
+    Expr(new IsEq(Expr(new Var("operand1")), Expr(new Var("operand2")))),
+    empty()
+  );
+}
+
+Value primitiveExit() {
+  return ClosureV(
+    std::vector<std::string>(),
+    Expr(new Exit()),
+    empty()
+  );
+}
+
+Value primitiveMakeVoid() {
+  return ClosureV(
+    std::vector<std::string>(),
+    Expr(new MakeVoid()),
+    empty()
+  );
+}
+
+Value primitiveCar() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new Car(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveCdr() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new Cdr(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveNot() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new Not(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveIsFixnum() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new IsFixnum(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveIsBoolean() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new IsBoolean(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveIsSymbol() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new IsSymbol(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveIsNull() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new IsNull(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveIsPair() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new IsPair(Expr(new Var("operand")))),
+    empty()
+  );
+}
+
+Value primitiveIsProcedure() {
+  return ClosureV(
+    std::vector<std::string> {"operand"},
+    Expr(new IsProcedure(Expr(new Var("operand")))),
+    empty()
+  );
 }

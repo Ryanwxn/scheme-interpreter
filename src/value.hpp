@@ -110,6 +110,28 @@ Value StringV(const std :: string &);
 
 std::ostream &operator<<(std::ostream &, Value &);
 
+Value primitivePlus();
+Value primitiveMinus();
+Value primitiveMult();
+Value primitiveLess();
+Value primitiveLessEq();
+Value primitiveEqual();
+Value primitiveGreaterEq();
+Value primitiveGreater();
+Value primitiveCons();
+Value primitiveIsEq();
+Value primitiveMakeVoid();
+Value primitiveExit();
+Value primitiveCar();
+Value primitiveCdr();
+Value primitiveNot();
+Value primitiveIsFixnum();
+Value primitiveIsBoolean();
+Value primitiveIsNull();
+Value primitiveIsPair();
+Value primitiveIsSymbol();
+Value primitiveIsProcedure();
+
 Assoc empty();
 Assoc extend(const std :: string&, const Value &, Assoc &);
 void modify(const std :: string&, const Value &, Assoc &);
