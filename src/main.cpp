@@ -42,7 +42,9 @@ void REPL()
     initGloabalEnv(global_env);
     while (1)
     {   
+        #ifndef ONLINE_JUDGE
         printf("scm> ");
+        #endif
         Syntax stx = readSyntax(std :: cin); // read
         try
         {
