@@ -43,7 +43,7 @@ void REPL()
     while (1)
     {   
         #ifndef ONLINE_JUDGE
-        printf("scm> ");
+            std::cout << "scm> ";
         #endif
         Syntax stx = readSyntax(std :: cin); // read
         try
@@ -57,8 +57,8 @@ void REPL()
         }
         catch (const RuntimeError &RE)
         {
-            // std :: cout << RE.message();
-            std :: cout << "RuntimeError";
+            std :: cout << RE.message();
+            // std :: cout << "RuntimeError";
         }
         puts("");
     }
