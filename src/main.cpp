@@ -42,7 +42,7 @@ void REPL()
     initGloabalEnv(global_env);
     while (1)
     {   
-        #ifndef ACMOJ
+        #ifndef ONLINEJUDGE
             std::cout << "scm> ";
         #endif
         Syntax stx = readSyntax(std :: cin); // read
