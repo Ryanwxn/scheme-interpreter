@@ -283,9 +283,6 @@ Value Not::evalRator(const Value &rand) {
 
 Value Car::evalRator(const Value &rand) {
     if(rand -> v_type != V_PAIR) {
-        std::cout << rand -> v_type << " ";
-        rand -> show(std::cout);
-        std::cout << std::endl;
         throw RuntimeError("<Evaluation> In Car.");
     }
     Pair *randV = dynamic_cast<Pair*>(rand.get());

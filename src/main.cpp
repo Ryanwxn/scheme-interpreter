@@ -42,6 +42,7 @@ void REPL()
     initGloabalEnv(global_env);
     while (1)
     {   
+    	#define ONLINE_JUDGE 
         #ifndef ONLINE_JUDGE
             std::cout << "scm> ";
         #endif
