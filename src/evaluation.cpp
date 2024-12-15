@@ -243,6 +243,12 @@ Value IsEq::evalRator(const Value &rand1, const Value &rand2) {
         std::string rand2V = dynamic_cast<Symbol*>(rand2.get()) -> s;
         return BooleanV(rand1V == rand2V);
     }
+    if(rand1T == V_NULL && rand2T == V_NULL) {
+      return BooleanV(true);
+    }
+    if(rand1T == V_VOID && rand2T == V_VOID) {
+      return BooleanV(true);
+    }
     return BooleanV(rand1.get() == rand2.get());
 }
 
